@@ -44,4 +44,5 @@ sudo su -
 ### 5. Fixing broken replication
 
 ## Resources
+- https://www.digitalocean.com/community/tutorials/how-to-set-up-mysql-master-master-replication
 - https://www.percona.com/blog/2013/01/09/how-does-mysql-replication-really-work/
