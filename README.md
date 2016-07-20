@@ -14,6 +14,7 @@ Is actually just a Vagrantfile that will bootstrap two virtual machines, install
 
 ### 1. Start the lab
 ```
+cd mysql-repl-lab
 vagrant up
 vagrant status
 ```
