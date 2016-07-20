@@ -10,7 +10,10 @@ There are other technics to achieve the same goals like MySQL Fabric and MySQL c
 - **Replication can break**, you need to know when this happens and you need to know what to do to make it working again. For sure it will break if you have hardware failure, or network failure, or anything that would make one of your replicate inaccessible. In those cases you'll have to bring your replicate back to life and resync your DB.
 
 ## The lab
-Is actually just a Vagrantfile that will bootstrap two virtual machines, install mysql and setup master/master replication on them. So it suppose you have a functionnal vagrant installation and a virtualbox provider for it.
+Is actually just a Vagrantfile that will bootstrap two virtual machines, install mysql and setup master/master replication on them. It suppose you have a functionnal vagrant installation and a virtualbox provider for it.
+By looking at the Vagrantfile, you'll see that we'll create a special conf file `repl.cnf`.
+You'd probably guessed already but it's absolutely not intended to be used as-is for production environments!
+Because it makes mysql listen on every network interface and set up no password for the root account. This is only done to make testing convenient.
 
 ### 1. Start the lab
 ```
