@@ -12,13 +12,13 @@ There are other technics to achieve the same goals like MySQL Fabric and MySQL c
 ## The lab
 Is actually just a Vagrantfile that will bootstrap two virtual machines, install mysql and setup master/master replication on them. So it suppose you have a functionnal vagrant installation and a virtualbox provider for it.
 
-### Start the lab
+### 1. Start the lab
 ```
 vagrant up
 vagrant status
 ```
 
-### Connect to nodes and start replication
+### 2. Connect to nodes and start replication
 So servers are started with mysql running, we still have to manually start the sync/replication process on the 2 nodes. 
 Please have a look at the content of `/root/start_replication.sh` script that's generated from the Vagrantfile during provisionning!
 
@@ -36,7 +36,12 @@ sudo su -
 ./start_replication.sh
 ```
 
-### Testing that it's working
+### 3. Testing that it's working
+
+
+### 4. Spotting replication breaks
+
+### 5. Fixing broken replication
 
 ## Resources
 - https://www.percona.com/blog/2013/01/09/how-does-mysql-replication-really-work/
