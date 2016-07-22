@@ -98,21 +98,44 @@ But it looks kind of magical isn't it ? Especialy if you're just copy/pasting co
 
 #### Master/Master and Master/Slave replication
 To understand how replication works in mysql, there already are good articles (see Resources part of this README) and I won't paraphrase them but I will show how we can monitor the replication process and see if it's working or not.
-It's actually quite easy, what's important to understand is that to replicate queries from mysql node A **to** node B, we have to tell node B that master is node A, and we issue a SQL query : 
+It's actually quite easy, what's important to understand is that to replicate queries from mysql node A **to** node B, we have to tell node B that master is node A, and we do that by issuing the following SQL query : 
 ```
-change master to    master_host     = node_A_I, 
+change master to    master_host     = node_A_IP, 
                     master_user     = '...',
                     master_password = '...',
                     master_log_file = '...',
-                    master_log_pos  = '...'
+                    master_log_pos  = '...';
+start slave;
 ```
 It tells node B how to connect to node A, what is the log transaction file on the master node and which position it's currently at.
-And those two last fields are really the important bits. It allows node B (which is now a slave of node A) to replicates queries which are executed on node A by reading the transaction log and by knowing where it should starts thanks to the position index.
-This is the case of master/slave replication: the master receives the `write` queries, slave replicates them, and then master and slave can serve read queries.
+And those two last fields are really the important bits. It allows node B (which is now a slave of node A) to replicates queries which are executed on node A by reading the transaction log and by knowing where to start reading from this file knowing the position index.
+This is the case of master/slave replication: `write` queries received on master node are replicated on slave node, but both nodes can serve `read` queries.
 
-And it's not so different in the case of master/master replication. Instead of having one slave replicating what's written on the master, we'll have each node replicating what the other one is writing to its DB, in other word each node will be the slave of the other one and we'll execute the ``change master to ...`` query on each node, pointing the master as the other node.
+And it's not so different in the case of master/master replication. Instead of having one slave replicating what's written on the master, we'll have each node replicating what the other one is writing to its DB, in other words each node will be the slave of the other and we'll execute the ``change master to ...`` query on each node, pointing the master as the other node.
 
 #### `master_log_file` and `master_log_pos`
+A few words on those fields. So they are used to point the slave to the log file on master where queries are logged (in a binary way) and tells him the position of the last query executed on master, so that the slave can catch up.
+
+But how do we find those parameters to set up our slave when we have a running master ? Well, we first have to check that the master is logging its queries (which is disabled by default). In `/etc/mysql/my.cnf` or in a file matching `/etc/mysql/conf.d/*.cnf` we have to look for an uncommented line with something like :
+```
+log_bin             = /var/log/mysql/mysql-bin.log
+```
+
+Then we reload mysql and we should end up with a master-ready node! Hopefully we can check that from mysql CLI, as writing binlog file is a master related thing, the command used to check that is :
+```
+mysql> show master status;                                        
++------------------+----------+--------------+------------------+ 
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | 
++------------------+----------+--------------+------------------+ 
+| mysql-bin.000002 |      210 | testdb       |                  | 
++------------------+----------+--------------+------------------+ 
+1 row in set (0.00 sec)
+mysql>                                                            
+```
+So we have a file name (note that it's not exactly what we've written in the `.cnf`), a `position` and two other columns.
+First, the `position` is what we need to write our `change master to...` query, so we're all set to set up our slave now.
+There are also a `binlog_do_db` and a `binlog_ignore_db` column. I haven't spoken about those yet but it's used to tell mysql which database we want to write binlog for (the `binlog_do_db`), or to write binlog for all databases but don't for some (the `binlog_ignore_db` one). This is defined in mysql *.cnf file, like the `log_bin` parameter.
+
 
 #### Monitoring replication
 
