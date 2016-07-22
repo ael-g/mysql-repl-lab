@@ -90,7 +90,7 @@ mysql> show tables from testdb;
 1 row in set (0.00 sec)
 ```
 
-So if we create a table on master1, it's replicating on master2! You're free to check the opposite or to test other types of SQL queries, either from master1 or from master2.
+It's replicating! You're free to check the opposite or to test other types of SQL queries, either from master1 or from master2.
 
 ### 4. Spotting replication break down
 From the previous points we can see that replication is quite easy to set-up.
